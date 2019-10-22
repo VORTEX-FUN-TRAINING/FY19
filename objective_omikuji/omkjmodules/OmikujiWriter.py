@@ -12,26 +12,22 @@ class OmikujiWriter:
         for fortune, detail in omikuji_raw_data.items():
             omikuji_obj = Omikuji()
             setattr(omikuji_obj, "index", fortune)
-            for key, value in detail.items():
-                t = type(value)
-                if t is str or t is int:
-                    setattr(omikuji_obj, key, value)
-                elif type(value) is dict:
-                    for k, v in value.items():
-                        if type(v) is str:
-                            fortune_name = v
-                        if type(v) is list:
-                            fortune_contents = random.choice(v)
-                    setattr(omikuji_obj, key, fortune_name + "," + fortune_contents)
+            self._extract_details(detail, omikuji_obj)
             self.omikuji_object_list.append(omikuji_obj)
+
+    def _extract_details(self, detail, omikuji_obj):
+        for key, value in detail.items():
+            t = type(value)
+            if t is str or t is int:
+                setattr(omikuji_obj, key, value)
+            elif type(value) is dict:
+                for k, v in value.items():
+                    if type(v) is str:
+                        fortune_name = v
+                    elif type(v) is list:
+                        fortune_contents = random.choice(v)
+                setattr(omikuji_obj, key, fortune_name + "," + fortune_contents)
 
     def get_omikuji_object_list(self):
         return self.omikuji_object_list
 
-
-if __name__ == "__main__":
-    from OmikujiProperties import OmikujiProperties
-
-    omkjp = OmikujiProperties()
-    omkjw = OmikujiWriter(omkjp)
-    print(vars(omkjw.omikuji_object_list[0]))
