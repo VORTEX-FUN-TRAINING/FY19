@@ -1,4 +1,4 @@
-from Omikuji import Omikuji
+from .Omikuji import Omikuji
 import random
 
 
