@@ -63,20 +63,21 @@ Python勉強会カリキュラム
 - webアプリとRESTAPIの関係
 - RESTAPIの実装方法
 
-### ２．djangoの紹介
+### ３．djangoの紹介
 - フレームワークとは
 - pythonのwebフレームワーク紹介
 - djangoの紹介
 - djangoでできること、できないこと
-- django REST frameworkの紹介
+- django REST framework(DRF)の紹介
 
-### ３．djangoインストール
+### ４．djangoインストール
 - djangoインストール
 - テストページ表示
 - 管理ページ表示
 
 ### ５．djangoサンプルアプリ作成
-- djangoで簡単なwebアプリを作成する
+- 簡単なRESTAPIを作成する
+- 簡単なwebアプリを作成する
 
 ### ６．難易度別tocaroボット作成例
 - 片方向にするか双方向にするか
