@@ -361,14 +361,25 @@ hogebot/hogebot/settings.py
 
 モデルの作成
 ==
+### モデルとは
+- djangoにおけるデータベース
+- djangoでは、データベースはPythonオブジェクトとして扱う
+  - SQLを扱わないのでセキュリティレベルが上がる
+  - テーブルの定義をPythonコードで行う
+  - テーブル名.objects.all()とかすると全レコードが取れたりとか、直感的にデータベースを扱うことができる
+
+---
+
+モデルの作成
+==
 - アプリケーション「api」で使用するデータベースを作成する
-> djangoでは、モデル＝データベースと理解してOK
+  - 名言（Quote）を保存するQuoteテーブルを作成
 - models.pyを編集して以下を追加して、保存
 ```python
 class Quote(models.Model):
     quote = models.TextField()
 ```
-- 今回はdjangoに組み込みのsqlite3を使用するため、データベースの設定は不要
+- 今回はdjangoに組み込みのsqlite3を使用するため、データベースサーバの設定は不要
   - もしMySQLやPostgresSQLを使いたい場合はsettings.pyに設定する（ので興味ある方はやってみてください）
 
 ---
@@ -480,11 +491,46 @@ INSTALLED_APPS = (
 - ハードウェア・OS・言語などのアプリケーション基盤に依存したデータを、XMLやJSONなどの基盤に依存しない形式に変換すること
   - webは様々なOSやハードウェアで利用されるため、特定の基盤に依存したデータでは通信が成り立たない
   - djangoでのデータベースはPythonのオブジェクトなので、
+ 
+---
+
+シリアライザーの設定
+==
+
+```Python
+class QuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quote
+        fields = ('quote')
+```
+
+
 
 ---
 
 ビューの設定
 ==
+### ビューとは
+- djangoの、いわば本体。djangoで処理したい内容を書くところ
+- 関数、クラスのどちらで書いてもよい
+  - 処理の数が増えるとクラスにしたほうがいいとか、そんなレベル
+
+### 余談
+- webアプリケーションではMVC
+
+---
+
+ビューの設定
+==
+- api/views.pyに以下を記載する
+```python
+from .models import Quote
+from .serializer import QuoteSerializer
+
+class QuoteViewSet(viewsets.ModelViewSet):
+    queryset = Quote.objects.all()
+    serializer_class = QuoteSerializer
+```
 
 
 
