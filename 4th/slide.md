@@ -17,19 +17,39 @@ Pythonスキルアップチーム勉強会
 
 本日のアジェンダ
 ==
-
-
+- webアプリケーションとRESTAPI
+- djangoとは
+- デプロイについて
+- AWS Lambda簡易講座
+- 企画アドバイスコーナー
 
 ---
+
+webアプリケーションとRESTAPI
+==
+
+---
+
+HTTPおさらい
+==
+- Hyper Text Tranfer Protocol
+- サーバ・クライアントモデル
+- 他文書へのリンクを持つハイパーテキストの仕様と、クライアントとサーバの間でそれをやりとりする仕様を決めたもの
+- URL(Uniform Resource Locater) で、ハイパーテキストの場所を指定する
+```
+http://hoge.com/document/sugoi/yabai.html
+```
+- 現在はテキストの転送だけでなく、パケット通信の基盤になったり（websocket)、ブラウザがアプリケーションの基盤になる（webassembly)など、進化の目覚ましいプロトコルのひとつ
+
+---
+
 
 HTTPメソッドおさらい
 ==
 ### GET
 - HTTPサーバからコンテンツを取得する
-- webブラウザでページを表示するときに使われる
 ### POST
 - HTTPサーバにコンテンツを配置する
-- SNSへの投稿、ファイル共有サービスへのアップロードなど
 ### PUT/PATCH
 - HTTPサーバに配置済みのコンテンツの一部を変更する
 ### DELETE
@@ -66,7 +86,8 @@ webアプリケーションの歴史
 ==
 
 ### CGIの時代
-- インターネット黎明期(Windows95 Plus!、第1次ブラウザ戦争)
+- インターネット普及前夜ごろ
+  - Windows95 Plus!、第1次ブラウザ戦争勃発
 - webサーバ内でPerlスクリプトを動かして、表示するたびに変化のあるwebページが出来るように進化した
   - アクセスカウンター、掲示板などが流行
 - JavaScriptは存在したが、互換性が低かったり機能が低く、ページの装飾程度にしか使われていなかった
@@ -112,21 +133,21 @@ webブラウザ - Internet - webサーバ - APサーバ(DBアクセス用サー�
 ==
 - 通常のデータベースはインターネット経由でアクセスされることは想定されていない
   - ブラウザとインターネットの間のFWがHTTP(S)しか許可してないことがある
+  - プロキシがいたりもする
   - SQLは自由度が高く、意図しないデータにアクセスされる危険がある
   - そもそもセキュリティ対策をするより、データベースとしてやることがいっぱいるある
-- HTTPを使ってデータベースに安全にアクセスする仕組みが登場 > RESTAPI誕生
+- HTTPを使ってデータベースに安全にアクセスする仕組みが登場 -> RESTAPI誕生
 > RESTAPIの利用はデータベースだけに限定されません。今回は話を簡略化するためにだいぶ端折っていますm(_ _)m)
 
 --- 
 
 RESTAPIとは
 ==
-- URLを使ってデータベースにアクセスできる仕組み
+- データベース構造をURLで表現し、HTTPでアクセするための仕組み
 > くどいですが本当はもっと細かい話があるのですが今回は割愛します
 - HTTPメソッドで、データの読み書き・更新・削除（CRUD)を実現する 
   - GETで読み出し、POSTで書き込み、PUTで更新、DELETEで削除
-- RESTAPIは状態を持たない
-  - 誰が、データベースをどこまで読んだか、などはRESTAPIサーバ側では管理しない
+- HTTPでアクセスできるので、認証や暗号化にHTTPSを使える
 
 ---
 
@@ -146,7 +167,7 @@ RESTAPIの例
 ==
 ### RESTAPIのURLが http://kakugen.com だった場合
 
-- idが1番の格言を読み込みたい場合
+- idが1の格言を読み込みたい場合
 ```
 curl http://kaugen.com/quote/1
 ```
@@ -157,10 +178,9 @@ curl -X POST -d '{"quote":"talk is cheap.show me the code.","author":"トーバ�
 ```
 - なお、以下のようなAPIはRESTAPIとは言わない
 ```
-/createuser
-/deleteuser
+http://kakugen.com/getquote
 ```
-- create/deleteという動作をAPI名に入れてしまっている。RESTでは、動作はHTTPメソッドで決める
+- getという動作をAPI名に入れてしまっている。RESTでは、動作はHTTPメソッドで決める
 
 ---
 
@@ -168,9 +188,14 @@ curl -X POST -d '{"quote":"talk is cheap.show me the code.","author":"トーバ�
 ==
 - webサービスの持っているデータをプログラムから利用するために、いろいろなAPIが存在する
 	- 天気予報、為替、飲食店情報、などなど
-- webAPIが提供されていない、あるいは利用者を制限しているような場合は、HTMLソースを解析して情報を抜き出す***スクレイピングをする必要がある
+- webAPIが提供されていない、あるいは利用者を制限しているような場合は、HTMLソースを解析して情報を抜き出す**スクレイピング**をする必要がある
 - webAPIを利用して新たなwebサービスを開発することを、マッシュアップという
   - クラウド家計簿、SNS統合サイトなど
+
+---
+
+djangoを使ってみよう
+==
 
 ---
 
@@ -183,7 +208,7 @@ curl -X POST -d '{"quote":"talk is cheap.show me the code.","author":"トーバ�
 - 存在しないURLを叩かれたときに弾く処理がいる
 - フォームの文字列を使ってSQLを叩く場合、SQLインジェクションされる可能性がある
 #### 定形処理
-- 商品一覧表示など、よく使う処理を何度も書くのか（コピペではメンテナンス性が下がる）
+- 〇〇一覧表示など、よく使う処理を何度も書くのか
 - ログインしてるかどうかの確認も定形処理の一つ
 
 ---
@@ -263,16 +288,16 @@ djangoでのwebアプリケーション構成図
 
 ---
 
-djangoを使ってみよう
+djangoのインストール
 ==
 - cloud9を起動して、Terminal起動
 - djangoテスト用ディレクトリ作成
 ```
-mkdir hogebot
+mkdir drftest
 ```
 - テスト用ディレクトリに移動
 ```
-cd hogebot 
+cd drftest
 ``` 
 - Python仮想環境を作成
 ```
@@ -285,7 +310,7 @@ source venv/bin/activate
 
 ---
 
-djangoを使ってみよう
+djangoのインストール
 ==
 - djangoのインストール
 ```
@@ -329,12 +354,51 @@ cd api
 
 ---
 
+ディレクトリ構成
+==
+```
+drftest/hogebot/
+├── api　（python manage.py startapp apiで作ったやつ）
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── hogebot　（django-admin startproject hogebotで作ったやつ）
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   └── settings.cpython-36.pyc
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── manage.py
+```
+
+
+
+
+---
+
 初期設定
 ==
+- pwdコマンドでカレントディレクトリを確認
+```
+/home/enviroment/drftest/hogebot
+```
 - 以下のファイルをcloud9で開く
 ```
-hogebot/hogebot/settings.py
+hogebot/settings.py
 ```
+
+---
+
+初期設定
+==
 - 以下の項目を編集する
   - ALLOWED_HOSTSを以下に変更
   ```
@@ -343,8 +407,10 @@ hogebot/hogebot/settings.py
   > アクセス元ではなく、自分のwebサイト名を書く設定なので注意
   - INSTALLED_APPSリストに以下を追加
   ```
-  'api'
+  'api',
   ```
+  > 最後のカンマをお忘れなく
+
 --- 
 
 初期設定
@@ -376,7 +442,7 @@ hogebot/hogebot/settings.py
 ==
 - アプリケーション「api」で使用するデータベースを作成する
   - 名言（Quote）を保存するQuoteテーブルを作成
-- models.pyを編集して以下を追加して、保存
+- api/models.pyを編集して以下を追加して、保存
 ```python
 class Quote(models.Model):
     quote = models.TextField()
@@ -409,7 +475,7 @@ django管理用ユーザーの作成
   - メアドは体をなしていれば適当でOK
   - パスワードは忘れないものを入れる。簡単な場合は、簡単だけどいい？って聞かれるのでYを選ぶ
 ```
-python manage.py createsuperuser
+python3 manage.py createsuperuser
 ```
 
 ---
@@ -422,7 +488,7 @@ python3 manage.py runserver
 ```
 - 起動結果確認
 ```
-(snip))
+(snip)
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
@@ -498,8 +564,12 @@ INSTALLED_APPS = (
 
 シリアライザーの設定
 ==
-
+- ファイルは存在しないので新規に作成する
+- api/serializer.py
 ```Python
+from rest_framework import serializers
+from .models import Quote
+
 class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
@@ -522,6 +592,7 @@ class QuoteSerializer(serializers.ModelSerializer):
 ==
 - api/views.pyに以下を記載する
 ```python
+from rest_framework import viewsets
 from .models import Quote
 from .serializer import QuoteSerializer
 
@@ -563,11 +634,12 @@ authentication_classes = []について
 - まずプロジェクト側に設定
 - hogebot/urls.pyに以下を追加
 ```python
-from blog.urls import router as blog_router
+from django.conf.urls import url, include
+from api.urls import router as api_router
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(blog_router.urls)),
+    url('^admin/', admin.site.urls),
+    url('^api/', include(api_router.urls)),
 ]
 ```
 
@@ -575,25 +647,53 @@ urlpatterns = [
 
 ルーティングの設定
 ==
-- 次にアプリケーション側を設定
-- api/urls.pyに以下を追加
+- 次にアプリケーション側を設定する
+- api/urls.pyを新規に作成
 ```python
 from rest_framework import routers
 from .views import QuoteViewSet
 
 router = routers.DefaultRouter()
 router.register('quotes', QuoteViewSet)
+```
 
 ---
 
 完成したので動かしてみる
 ==
 - お疲れさまでした！動かしてみましょう
-- 以下を実行
+- 以下を実行してdjangoを起動
 ```
 python3 manage.py runserver
 ```
-- 
+- GETしてみる
+```
+curl http://localhost:8000/api/quotes/
+```
+- データが何も入ってないので空のレスポンスが変える（と思う
+
+---
+
+完成したので動かしてみる
+==
+- POSTでデータを追加
+```
+curl -X POST -H "Content-Type: application/json" -d '{"quote":"fugafuga"}' localhost:8000/api/quotes/
+```
+- エラーが出なければOK
+- 再度、GET
+```
+curl http://localhost:8000/api/quotes/
+```
+- 入れた文字が帰ってくる
+```
+[{"quote":"fugafuga"}]
+```
+
+---
+
+デプロイについて
+==
 
 ---
 
@@ -697,20 +797,9 @@ Lambdaへのコードの配置とテスト方法
 - 各チームの企画についてアドバイスさせていただきます
 > 資料を手抜きしたかったわけではありません
 
-
-
-
 ---
-アプリケーションとデータベースの関係
+
+本日は以上です。
+お疲れさまでした
 ==
-- アプリケーションは、必ずなにかしらのデータを扱っている
-  - 商品情報とか、買い物かごの中身とか、在庫情報とか、顧客情報とか・・・
-- データは、データベースに置かれる
-- データベースを直接操作しても、情報を扱うことはできる
-  - SQL文を駆使して、欲しい商品を探し出して買い物かごに入れることは出来るだろう
-- でも、それでは扱いにくい！uuu
-- データベー1kk11uuuuuu{uuuuスの操作をさせつつ、人間が操作しやすい画面を提供するソフトウェアがあればよいのでは＝アプリケーションの誕生
-### アプリケーションとは、データベースを扱いやすくするためのもの
-
----
-
+- コンテストがんばってください！
