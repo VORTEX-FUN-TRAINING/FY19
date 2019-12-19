@@ -18,7 +18,7 @@ Pythonスキルアップチーム勉強会
 本日のアジェンダ
 ==
 - webアプリケーションとRESTAPI
-- djangoとは
+- djangoを使ってみよう
 - デプロイについて
 - AWS Lambda簡易講座
 - 企画アドバイスコーナー
@@ -270,7 +270,8 @@ djangoでのアプリ開発の流れ
 ==
 - djangoのインストール
 - プロジェクトとアプリケーション作成
-- モデル（データベース）作成
+- モデル作成
+  - データベースを定義する
 - ビュー作成
   - URLにアクセスされたときの、返すレスポンスを決める
 - ルーティング設定
@@ -432,6 +433,7 @@ hogebot/settings.py
 ### モデルとは
 - djangoにおけるデータベース
 - djangoでは、データベースはPythonオブジェクトとして扱う
+  - ObjectとRelationalDBを紐付けるのでORマッパーと呼ばれる
   - SQLを扱わないのでセキュリティレベルが上がる
   - テーブルの定義をPythonコードで行う
   - テーブル名.objects.all()とかすると全レコードが取れたりとか、直感的にデータベースを扱うことができる
@@ -492,7 +494,7 @@ python3 manage.py runserver
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
-- ↑の状態で停止すればOK。djangoが起動してHTTPアクセスを待ち受けている状態
+- ↑の状態で停止すればOK。djangoが起動してHTTPアクセスを待ち受けている状態
 
 ---
 
@@ -545,10 +547,11 @@ django rest frameworkの組み込み
 ```
 INSTALLED_APPS = (
   ...
-  'api', <- さっき書いたやつ
-  'rest_framework', <-カンマを忘れずに
+  'api',
+  'rest_framework',
 )
 ```
+> 最後のカンマをお忘れなく
 - これだけです。簡単！
   
 ---
@@ -558,7 +561,7 @@ INSTALLED_APPS = (
 ### シリアライズとは
 - ハードウェア・OS・言語などのアプリケーション基盤に依存したデータを、XMLやJSONなどの基盤に依存しない形式に変換すること
   - webは様々なOSやハードウェアで利用されるため、特定の基盤に依存したデータでは通信が成り立たない
-  - djangoでのデータベースはPythonのオブジェクトなので、
+- Pythonのオブジェクトなど、言語に依存したデータ形式をファイル保存やネットワーク転送ができるバイト列にするという意味でも使われる
  
 ---
 
@@ -573,8 +576,9 @@ from .models import Quote
 class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
-        fields = ('quote')
+        fields = ('quote',)
 ```
+> 最後のカンマをお忘れなく
 
 ---
 
