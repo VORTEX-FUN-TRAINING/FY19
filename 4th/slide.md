@@ -642,7 +642,7 @@ from django.conf.urls import url, include
 from api.urls import router as api_router
 
 urlpatterns = [
-    url('^admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     url('^api/', include(api_router.urls)),
 ]
 ```
@@ -674,7 +674,7 @@ python3 manage.py runserver
 ```
 curl http://localhost:8000/api/quotes/
 ```
-- データが何も入ってないので空のレスポンスが変える（と思う
+- データが何も入ってないので空のレスポンスが返ってくる（と思う
 
 ---
 
